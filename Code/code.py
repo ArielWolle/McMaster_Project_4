@@ -26,10 +26,14 @@ z_up = digitalio.DigitalInOut(board.GP4)
 z_down = digitalio.DigitalInOut(board.GP5)
 
 # Setup z movement pins as input
-z_plus.direction = digitalio.Direction.INPUT
-z_minus.direction = digitalio.Direction.INPUT
+z_up.direction = digitalio.Direction.INPUT
+z_down.direction = digitalio.Direction.INPUT
 
-z_motor = pwmio.PWMOut(board.A2, duty_cycle_cycle=2 ** 15, frequency=50)
+# Setup stepper pwm pin
+pwm = pwmio.PWMOut(board.GP14, duty_cycle_cycle=2 ** 15, frequency=50)
+
+# Setup z motor
+my_servo = servo.Servo(pwm)
 
 # Setup x motor pins
 x_coils = (
@@ -46,8 +50,48 @@ y_coils = (
     digitalio.DigitalInOut(board.GP13),  # B2
 )
 
+
 # Setup x and y motor pin direction
 for coil in x_coils:
     coil.direction = digitalio.Direction.OUTPUT
 for coil in y_coils:
     coil.direction = digitalio.Direction.OUTPUT
+
+# Setup x motor
+x_motor = stepper.StepperMotor(
+    x_coils[0], x_coils[1], x_coils[2], x_coils[3], microsteps=None
+)
+x_motor.release()
+
+# Setup y motor
+y_motor = stepper.StepperMotor(
+    y_coils[0], y_coils[1], y_coils[2], y_coils[3], microsteps=None
+)
+y_motor.release()
+
+# Setup movement variables
+angle = 0
+my_servo.angle = 0
+time.sleep(1)
+
+
+while True:
+    if x_plus.value:
+        x_motor.onestep(direction=stepper.FORWARD)
+    elif x_minus:
+        x_motor.onestep(direction=stepper.BACKWARD)
+
+    if y_plus.value:
+        y_motor.onestep(direction=stepper.FORWARD)
+    elif y_minus.value:
+        y_motor.onestep(direction=stepper.BACKWARD)
+
+    if z_up.value:
+        if angle + 5 < 180:
+            angle += 5
+            my_servo.angle = angle
+    elif z_down.value:
+        if angle - 5 > 0:
+            angle -= 5
+            my_servo.angle = angle
+    time.sleep(0.01)
