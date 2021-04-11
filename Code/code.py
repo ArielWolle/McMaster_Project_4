@@ -6,6 +6,22 @@ import pwmio
 from adafruit_motor import servo
 from adafruit_motor import stepper
 
+# Author: Ariel Wolle
+
+# Description:
+# This code is to be run on a Raspberry Pi Pico using the wiring diagram included in the wiring folder
+# The main function of this code is to control a 3 axis CNC painting machine for my ENG1P13 University Course
+
+# Input provided to the user:
+# 8-axis Joystick that uses 4 microswitches as an input (GPIO2-5)
+# 2 Arcade style buttons that use 2 microswitches as an input (GPOI19-20)
+
+# Input used by the machine:
+# 4 limit switches that act as endstops for the CNC machine (GPIO14-17)
+
+# Outputs:
+# 2x4 PWM GPIO for each stepper motors (GPIO6-13)
+# 1 PWM GPIO for the Rotational axis servo (GPOI18)
 
 # Setup Joystick pins
 x_plus = digitalio.DigitalInOut(board.GP2)
@@ -95,8 +111,6 @@ time.sleep(1)
 # Main Loops
 while True:
     time.sleep(0.001)
-    print(my_servo.angle)
-    # print(x_plus.value, " ", x_plus_endstop.value)
     # Check for x movement in joystick and that the pen plotter is not at max/min x
     if x_plus.value and (x_plus_endstop.value):
         x_motor.onestep(direction=stepper.FORWARD, style=stepper.MICROSTEP)
@@ -110,7 +124,6 @@ while True:
         y_motor.onestep(direction=stepper.BACKWARD, style=stepper.MICROSTEP)
 
     # Checks that only on button is pressed for z movement
-
     if not (z_up.value and z_down.value):
         # Checks if z value is not at max and up button is pressed
         if z_up.value:
