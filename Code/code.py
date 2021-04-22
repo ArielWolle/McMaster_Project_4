@@ -92,6 +92,8 @@ x_minus_endstop = digitalio.DigitalInOut(board.GP15)
 y_plus_endstop = digitalio.DigitalInOut(board.GP16)
 y_minus_endstop = digitalio.DigitalInOut(board.GP17)
 
+# new comment
+
 # Setup endstop pins as input
 x_plus_endstop.direction = digitalio.Direction.INPUT
 x_minus_endstop.direction = digitalio.Direction.INPUT
